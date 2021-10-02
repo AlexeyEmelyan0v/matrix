@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <algorithm>
+#include <math.h>
 
 using namespace std;
 
@@ -25,6 +27,7 @@ public:
     template<typename Type> friend ostream& operator<<(ostream&, const matrix<Type>&);
     const matrix transpose() const;
     const matrix fastpow(int) const;
+    T det() const;
 };
 
 template<typename T>
@@ -135,6 +138,48 @@ const matrix<T> matrix<T>::fastpow(int k) const{
             } else {
                 q /= 2;
                 value = value * value;
+            }
+        }
+    }
+    return res;
+}
+
+template<typename T>
+T matrix<T>::det() const{
+    if(n!=m){
+        throw "First matrix isn't a square";
+    }
+    vector<int> p(n);
+    T res = 0;
+    if(n==m) {
+        for (int i = 0; i < n; i++) {
+            p[i] = i;
+        }
+
+        int sl = 1;
+        int sigma;
+        for (int i = 0; i < n; i++) {
+            sl *= data[i][p[i]];
+        }
+        res += sl;
+        while (next_permutation(p.begin(), p.end())) {
+            sigma = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    if (p[j] < p[i]) {
+                        sigma++;
+                    }
+                }
+            }
+            sigma = sigma % 2;
+            sl = 1;
+            for (int i = 0; i < n; i++) {
+                sl *= data[i][p[i]];
+            }
+            if (sigma % 2 == 0) {
+                res += sl;
+            } else {
+                res -= sl;
             }
         }
     }

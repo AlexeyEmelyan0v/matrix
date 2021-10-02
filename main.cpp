@@ -43,10 +43,17 @@ int main() {
         if(q%10==3){
             cout<<"rd power:\n";
         }
-        cout<<a.fastpow(q)<<endl;
+        cout<<a.fastpow(q)<<"\n";
     }
     catch(const char* msg){
         cerr<<"Exception caught: "<<msg<<endl;
     }
+    try{
+        cout<<"Determinant of the first matrix:\n"<<a.det()<<endl;
+    }
+    catch(const char* msg){
+        cerr<<"Exception caught: "<<msg<<endl;
+    }
+
     return 0;
 }
