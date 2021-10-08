@@ -10,44 +10,62 @@
 using namespace std;
 
 template <typename T>
-class matrix{
+class matrix {
     int n;
     int m;
     vector<vector<T>> data;
 public:
-    matrix(vector<vector<T>>);
-    matrix(int n1,int m1);
+    matrix(vector<vector<T>> a);
+
+    matrix(int n1, int m1);
+
     int size() const { return n; };
-    const matrix operator+(const matrix&) const;
+
+    const matrix operator+(const matrix &) const;
+
     const matrix operator*(T) const;
-    const matrix operator*(const matrix&) const;
-    vector<T>& operator[](int i){ return data[i]; };
-    const vector<T>& operator[](int i) const { return data[i]; };
-    template<typename Type> friend istream& operator>>(istream&, matrix<Type>&);
-    template<typename Type> friend ostream& operator<<(ostream&, const matrix<Type>&);
+
+    const matrix operator*(const matrix &) const;
+
+    vector<T> &operator[](int i) { return data[i]; };
+
+    const vector<T> &operator[](int i) const { return data[i]; };
+
+    template<typename Type>
+    friend istream &operator>>(istream &, matrix<Type> &);
+
+    template<typename Type>
+    friend ostream &operator<<(ostream &, const matrix<Type> &);
+
     const matrix transpose() const;
+
     const matrix fastpow(int) const;
+
     T det() const;
+
+    const matrix<T> gauss() const;
+
+    const matrix<T> idenmat() const;
 };
 
 template<typename T>
 matrix<T>::matrix(vector<vector<T>> v) {
-    data=v;
-    n=v.size();
-    m=v[0].size();
+    data = v;
+    n = v.size();
+    m = v[0].size();
 }
 
 template<typename T>
 matrix<T>::matrix(int n1,int m1) {
-    n=n1;
-    m=m1;
-    vector<vector<T>> a(n,vector<T>(m,0));
-    data=a;
+    n = n1;
+    m = m1;
+    vector<vector<T>> a(n, vector<T>(m, 0));
+    data = a;
 }
 
 template<typename T>
 ostream& operator<<(ostream& out, const matrix<T>& a) {
-    for(int i=0;i<a.size();i++) {
+    for (int i = 0; i < a.size(); i++) {
         for (int j = 0; j < a[i].size(); j++) {
             out << a[i][j] << " ";
         }
@@ -58,7 +76,7 @@ ostream& operator<<(ostream& out, const matrix<T>& a) {
 
 template<typename T>
 istream &operator>>(istream& in, matrix<T>& a) {
-    for(int i=0;i<a.size();i++) {
+    for (int i = 0; i < a.size(); i++) {
         for (int j = 0; j < a[i].size(); j++) {
             in >> a[i][j];
         }
@@ -68,11 +86,11 @@ istream &operator>>(istream& in, matrix<T>& a) {
 
 template<typename T>
 const matrix<T> matrix<T>::operator+(const matrix& a) const {
-    if(a.size()!=n || a[0].size()!=m){
+    if (a.size() != n || a[0].size() != m) {
         throw "Matrices have different sizes";
     }
-    vector<vector<T>> res(n,vector<T>(m));
-    if(a.size()==n && a[0].size()==m) {
+    vector<vector<T>> res(n, vector<T>(m));
+    if (a.size() == n && a[0].size() == m) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 res[i][j] = data[i][j] + a[i][j];
@@ -84,10 +102,10 @@ const matrix<T> matrix<T>::operator+(const matrix& a) const {
 
 template<typename T>
 const matrix<T> matrix<T>::operator*(T k) const {
-    vector<vector<T>> res(n,vector<T>(m));
-    for(int i=0;i<n;i++){
-        for(int j=0;j<m;j++){
-            res[i][j]=data[i][j]*k;
+    vector<vector<T>> res(n, vector<T>(m));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            res[i][j] = data[i][j] * k;
         }
     }
     return matrix(res);
@@ -95,11 +113,11 @@ const matrix<T> matrix<T>::operator*(T k) const {
 
 template<typename T>
 const matrix<T> matrix<T>::operator*(const matrix& a) const {
-    if(m!=a.size()){
+    if (m != a.size()) {
         throw "Matrices have wrong sizes for their multiplication";
     }
-    vector<vector<T>> res(n,vector<T>(a.m));
-    if(m==a.size()) {
+    vector<vector<T>> res(n, vector<T>(a.m));
+    if (m == a.size()) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < a.m; j++) {
                 for (int r = 0; r < m; r++) {
@@ -113,24 +131,24 @@ const matrix<T> matrix<T>::operator*(const matrix& a) const {
 
 template<typename T>
 const matrix<T> matrix<T>::transpose() const {
-    vector<vector<T>> res(m,vector<T>(n));
-    for(int i=0;i<m;i++){
-        for(int j=0;j<n;j++){
-            res[i][j]=data[j][i];
+    vector<vector<T>> res(m, vector<T>(n));
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            res[i][j] = data[j][i];
         }
     }
     return matrix(res);
 }
 
 template<typename T>
-const matrix<T> matrix<T>::fastpow(int k) const{
+const matrix<T> matrix<T>::fastpow(int k) const {
     matrix<int> res(data);
     matrix<int> value(data);
-    int q=k-1;
-    if(n!=m){
+    int q = k - 1;
+    if (n != m) {
         throw "First matrix isn't a square";
     }
-    if(n==m) {
+    if (n == m) {
         while (q > 0) {
             if (q % 2 == 1) {
                 res = res * value;
@@ -145,13 +163,13 @@ const matrix<T> matrix<T>::fastpow(int k) const{
 }
 
 template<typename T>
-T matrix<T>::det() const{
-    if(n!=m){
+T matrix<T>::det() const {
+    if (n != m) {
         throw "First matrix isn't a square";
     }
     vector<int> p(n);
     T res = 0;
-    if(n==m) {
+    if (n == m) {
         for (int i = 0; i < n; i++) {
             p[i] = i;
         }
@@ -180,6 +198,104 @@ T matrix<T>::det() const{
                 res += sl;
             } else {
                 res -= sl;
+            }
+        }
+    }
+    return res;
+}
+
+template<typename T>
+const matrix<T> matrix<T>::gauss() const {
+    vector<vector<T>> res;
+    res = data;
+    bool q = 1;
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (q == 0) {
+                break;
+            }
+            if (res[i][i] == 0) {
+                int l = i;
+                while (res[l][i] == 0) {
+                    if (l == n - 1) {
+                        q = 0;
+                        throw "Bad matrix: determinant = 0";
+                        break;
+                    }
+                    l++;
+                }
+                if (q == 0) {
+                    break;
+                }
+                if (q && l < n && l != i) {
+                    for (int p = i; p < m; p++) {
+                        res[i][p] += res[l][p];
+                    }
+                    for (int p = i; p < m; p++) {
+                        res[l][p] -= res[i][p];
+                    }
+                    for (int p = i; p < m; p++) {
+                        res[i][p] -= res[l][p];
+                    }
+                }
+            }
+            if (q) {
+                double k = res[j][i] / res[i][i];
+                for (int l = i; l < m; l++) {
+                    res[j][l] -= res[i][l] * k;
+                }
+            }
+        }
+        if (i == n - 1 && res[i][i] == 0) {
+            q = 0;
+        }
+        if (q == 0) {
+            break;
+        }
+    }
+    if (q == 0) {
+        throw "Bad matrix: determinant = 0";
+    }
+    return res;
+}
+
+template<typename T>
+const matrix<T> matrix<T>::idenmat() const {
+    matrix<T> res(n, m);
+    if (n != m) {
+        throw "wrong size";
+    }
+    if (n == m) {
+        matrix<T> b(n, 2 * m);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                b[i][j] = data[i][j];
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = m; j < 2 * m; j++) {
+                if (i == j - m) {
+                    b[i][j] = 1;
+                } else {
+                    b[i][j] = 0;
+                }
+            }
+        }
+        b = b.gauss();
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = 0; j < 2 * m; j++) {
+                b[i][j] /= b[i][i];
+            }
+            for (int j = 0; j < i; j++) {
+                double k = b[j][i];
+                for (int l = 0; l < 2 * m; l++) {
+                    b[j][l] -= b[i][l] * k;
+                }
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = m; j < 2 * m; j++) {
+                res[i][j - m] = b[i][j];
             }
         }
     }
