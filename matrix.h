@@ -206,8 +206,7 @@ T matrix<T>::det() const {
 
 template<typename T>
 const matrix<T> matrix<T>::gauss() const {
-    vector<vector<T>> res;
-    res = data;
+    matrix<T> res(data);
     bool q = 1;
     for (int i = 0; i < n; i++) {
         for (int j = i + 1; j < n; j++) {
@@ -229,19 +228,13 @@ const matrix<T> matrix<T>::gauss() const {
                 }
                 if (q && l < n && l != i) {
                     for (int p = i; p < m; p++) {
-                        res[i][p] += res[l][p];
-                    }
-                    for (int p = i; p < m; p++) {
-                        res[l][p] -= res[i][p];
-                    }
-                    for (int p = i; p < m; p++) {
-                        res[i][p] -= res[l][p];
+                        swap(res[i][p], res[l][p]);
                     }
                 }
             }
             if (q) {
                 double k = res[j][i] / res[i][i];
-                for (int l = i; l < m; l++) {
+                for (int l = 0; l < m; l++) {
                     res[j][l] -= res[i][l] * k;
                 }
             }
@@ -283,8 +276,9 @@ const matrix<T> matrix<T>::idenmat() const {
         }
         b = b.gauss();
         for (int i = n - 1; i >= 0; i--) {
+            double k=1/b[i][i];
             for (int j = 0; j < 2 * m; j++) {
-                b[i][j] /= b[i][i];
+                b[i][j] *= k;
             }
             for (int j = 0; j < i; j++) {
                 double k = b[j][i];
