@@ -206,48 +206,56 @@ T matrix<T>::det() const {
 
 template<typename T>
 const matrix<T> matrix<T>::gauss() const {
-    matrix<T> res(data);
-    bool q = 1;
+    matrix<T> res(n, m);
     for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) {
-            if (q == 0) {
-                break;
-            }
-            if (res[i][i] == 0) {
-                int l = i;
-                while (res[l][i] == 0) {
-                    if (l == n - 1) {
-                        q = 0;
-                        throw "Bad matrix: determinant = 0";
-                        break;
-                    }
-                    l++;
-                }
-                if (q == 0) {
-                    break;
-                }
-                if (q && l < n && l != i) {
-                    for (int p = i; p < m; p++) {
-                        swap(res[i][p], res[l][p]);
-                    }
-                }
-            }
-            if (q) {
-                double k = res[j][i] / res[i][i];
-                for (int l = 0; l < m; l++) {
-                    res[j][l] -= res[i][l] * k;
-                }
-            }
-        }
-        if (i == n - 1 && res[i][i] == 0) {
-            q = 0;
-        }
-        if (q == 0) {
-            break;
+        for (int j = 0; j < m; j++) {
+            res[i][j] = data[i][j];
         }
     }
-    if (q == 0) {
-        throw "Bad matrix: determinant = 0";
+    for (int st = 0, str = 0; st < m - 1 && str < n; st++) {
+        int l = str;
+        while (res[l][st] == 0) {
+            if (l == n - 1) {
+                break;
+            }
+            l++;
+        }
+        if (res[l][st] == 0) {
+            continue;
+        }
+        for (int i = st; i < m; i++) {
+            swap(res[l][i], res[str][i]);
+        }
+        for (int i = str + 1; i < n; i++) {
+            double k = res[i][st] / res[str][st];
+            for (int l = st; l < m; l++) {
+                res[i][l] -= res[str][l] * k;
+            }
+        }
+        str++;
+    }
+    for (int i = 0; i < n; i++) {
+        int l = 0;
+        while (res[i][l] == 0) {
+            if (l == m - 2) {
+                break;
+            }
+            l++;
+        }
+        if (res[i][l] != 0) {
+            double k = 1 / res[i][l];
+            for (int j = 0; j < m; j++) {
+                res[i][j] *= k;
+            }
+            for (int j = 0; j < i; j++) {
+                double k = res[j][l];
+                for (int p = 0; p < m; p++) {
+                    res[j][p] -= res[i][p] * k;
+                }
+            }
+        } else {
+            throw "System is inconsistent.";
+        }
     }
     return res;
 }
